@@ -1,0 +1,10 @@
+[package]
+name = "safe-upgrade-new"
+version = "0.2.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+soroban-sdk = "21"

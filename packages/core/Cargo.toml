@@ -1,0 +1,20 @@
+[package]
+name = "soroban-drift-core"
+version = "0.1.0"
+description = "Static-analysis library for detecting breaking changes in Soroban smart contracts"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+syn = { version = "2.0.119", features = ["full", "extra-traits"] }
+proc-macro2 = "1"
+quote = "1"
+wasmparser = "0.254.0"
+walkdir = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+
+[dev-dependencies]
+tempfile = "3"
