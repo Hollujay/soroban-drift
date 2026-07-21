@@ -134,13 +134,61 @@ fn has_contracttype_attr(attrs: &[Attribute]) -> bool {
     })
 }
 
+fn field_type_to_string(ty: &syn::Type) -> String {
+    format_type(ty)
+}
+
+fn format_type(ty: &syn::Type) -> String {
+    match ty {
+        syn::Type::Path(tp) => {
+            let segments: Vec<String> = tp
+                .path
+                .segments
+                .iter()
+                .map(|seg| {
+                    let base = seg.ident.to_string();
+                    match &seg.arguments {
+                        syn::PathArguments::None => base,
+                        syn::PathArguments::AngleBracketed(generic) => {
+                            let args: Vec<String> = generic
+                                .args
+                                .iter()
+                                .map(|arg| match arg {
+                                    syn::GenericArgument::Type(t) => format_type(t),
+                                    syn::GenericArgument::Lifetime(l) => l.ident.to_string(),
+                                    _ => "...".to_string(),
+                                })
+                                .collect();
+                            format!("{}<{}>", base, args.join(", "))
+                        }
+                        _ => base,
+                    }
+                })
+                .collect();
+            segments.join("::")
+        }
+        syn::Type::Reference(r) => {
+            let mut s = String::from("&");
+            if r.mutability.is_some() {
+                s.push_str("mut ");
+            }
+            s.push_str(&format_type(&r.elem));
+            s
+        }
+        _ => {
+            // Fallback: use the Debug representation
+            format!("{:?}", ty)
+        }
+    }
+}
+
 pub(crate) fn extract_struct_key(s: &ItemStruct) -> StorageKey {
     let fields = s
         .fields
         .iter()
         .map(|f| {
             let name = f.ident.as_ref().map(|i| i.to_string()).unwrap_or_default();
-            let ty = quote::quote!(#f.ty).to_string();
+            let ty = field_type_to_string(&f.ty);
             FieldInfo { name, ty }
         })
         .collect();
@@ -162,12 +210,12 @@ pub(crate) fn extract_enum_key(e: &ItemEnum) -> StorageKey {
                 syn::Fields::Unit => "()".to_string(),
                 syn::Fields::Unnamed(f) => {
                     let types: Vec<String> =
-                        f.unnamed.iter().map(|field| quote::quote!(#field.ty).to_string()).collect();
+                        f.unnamed.iter().map(|field| field_type_to_string(&field.ty)).collect();
                     types.join(", ")
                 }
                 syn::Fields::Named(f) => {
                     let types: Vec<String> =
-                        f.named.iter().map(|field| quote::quote!(#field.ty).to_string()).collect();
+                        f.named.iter().map(|field| field_type_to_string(&field.ty)).collect();
                     types.join(", ")
                 }
             };
