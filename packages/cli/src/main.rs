@@ -1,14 +1,17 @@
-use std::path::PathBuf;
 use clap::Parser;
+use std::path::PathBuf;
 
 use soroban_drift_core::diff_engine::diff;
-use soroban_drift_core::types::*;
+use soroban_drift_core::report;
 use soroban_drift_core::rust_parser::parse_crate;
 use soroban_drift_core::spec_extractor::extract_spec;
-use soroban_drift_core::report;
+use soroban_drift_core::types::*;
 
 #[derive(Parser)]
-#[command(name = "soroban-drift", about = "Detect breaking changes between two versions of a Soroban smart contract")]
+#[command(
+    name = "soroban-drift",
+    about = "Detect breaking changes between two versions of a Soroban smart contract"
+)]
 struct Cli {
     /// Path to the old version of the contract crate (source directory)
     old: PathBuf,
@@ -37,8 +40,10 @@ fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     // Parse source code
-    let old_ast = parse_crate(&cli.old).map_err(|e| anyhow::anyhow!("Failed to parse old version: {}", e))?;
-    let new_ast = parse_crate(&cli.new).map_err(|e| anyhow::anyhow!("Failed to parse new version: {}", e))?;
+    let old_ast =
+        parse_crate(&cli.old).map_err(|e| anyhow::anyhow!("Failed to parse old version: {}", e))?;
+    let new_ast =
+        parse_crate(&cli.new).map_err(|e| anyhow::anyhow!("Failed to parse new version: {}", e))?;
 
     // Parse WASM specs (if provided)
     let old_spec = if let Some(ref wasm_path) = cli.old_wasm {

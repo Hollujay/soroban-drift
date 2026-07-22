@@ -1,4 +1,4 @@
-use crate::types::{DriftReport, DriftFinding, Severity};
+use crate::types::{DriftFinding, DriftReport, Severity};
 use std::io;
 
 /// Write the drift report as JSON to the given writer.
@@ -14,7 +14,15 @@ pub fn write_markdown<W: io::Write>(report: &DriftReport, writer: &mut W) -> io:
     writeln!(writer)?;
     writeln!(writer, "- **Old version**: `{}`", report.old_path)?;
     writeln!(writer, "- **New version**: `{}`", report.new_path)?;
-    writeln!(writer, "- **Status**: {}", if report.has_breaking_changes { "BREAKING CHANGES DETECTED" } else { "No breaking changes" })?;
+    writeln!(
+        writer,
+        "- **Status**: {}",
+        if report.has_breaking_changes {
+            "BREAKING CHANGES DETECTED"
+        } else {
+            "No breaking changes"
+        }
+    )?;
     writeln!(writer)?;
 
     if report.findings.is_empty() {
@@ -23,9 +31,21 @@ pub fn write_markdown<W: io::Write>(report: &DriftReport, writer: &mut W) -> io:
     }
 
     // Group findings by severity
-    let breaking: Vec<&DriftFinding> = report.findings.iter().filter(|f| f.severity == Severity::Breaking).collect();
-    let warnings: Vec<&DriftFinding> = report.findings.iter().filter(|f| f.severity == Severity::Warning).collect();
-    let infos: Vec<&DriftFinding> = report.findings.iter().filter(|f| f.severity == Severity::Info).collect();
+    let breaking: Vec<&DriftFinding> = report
+        .findings
+        .iter()
+        .filter(|f| f.severity == Severity::Breaking)
+        .collect();
+    let warnings: Vec<&DriftFinding> = report
+        .findings
+        .iter()
+        .filter(|f| f.severity == Severity::Warning)
+        .collect();
+    let infos: Vec<&DriftFinding> = report
+        .findings
+        .iter()
+        .filter(|f| f.severity == Severity::Info)
+        .collect();
 
     if !breaking.is_empty() {
         writeln!(writer, "## Breaking Changes")?;
@@ -81,7 +101,12 @@ pub fn exit_code(report: &DriftReport, fail_on: &str) -> i32 {
             }
         }
         "warning" => {
-            if report.has_breaking_changes || report.findings.iter().any(|f| f.severity == Severity::Warning) {
+            if report.has_breaking_changes
+                || report
+                    .findings
+                    .iter()
+                    .any(|f| f.severity == Severity::Warning)
+            {
                 1
             } else {
                 0

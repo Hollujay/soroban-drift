@@ -1,12 +1,15 @@
 use crate::types::{ContractSpec, FunctionSpec, ParamInfo};
-use std::path::Path;
 use std::fs;
+use std::path::Path;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SpecExtractError {
     #[error("I/O error reading {path}: {source}")]
-    Io { path: String, source: std::io::Error },
+    Io {
+        path: String,
+        source: std::io::Error,
+    },
     #[error("Invalid WASM file {path}: {message}")]
     InvalidWasm { path: String, message: String },
     #[error("WASM parse error: {0}")]
@@ -73,9 +76,7 @@ fn parse_contractspec_section(data: &[u8], spec: &mut ContractSpec) {
     let mut offset = 0;
     while offset + 4 <= data.len() {
         // Read discriminant (u32 LE)
-        let disc = u32::from_le_bytes(
-            data[offset..offset + 4].try_into().unwrap(),
-        );
+        let disc = u32::from_le_bytes(data[offset..offset + 4].try_into().unwrap());
         offset += 4;
 
         match disc {
@@ -159,7 +160,14 @@ fn parse_function_entry(data: &[u8]) -> Option<(FunctionSpec, usize)> {
         });
     }
 
-    Some((FunctionSpec { name, inputs, outputs }, offset))
+    Some((
+        FunctionSpec {
+            name,
+            inputs,
+            outputs,
+        },
+        offset,
+    ))
 }
 
 /// Read an XDR length-prefixed string from the given offset.

@@ -10,8 +10,16 @@ fn safe_upgrade_old_parses() {
         .unwrap()
         .join("examples/safe-upgrade/old");
     let ast = soroban_drift_core::rust_parser::parse_crate(&path).unwrap();
-    assert_eq!(ast.storage_keys.len(), 2, "safe-upgrade old should have 2 storage keys");
-    assert_eq!(ast.functions.len(), 3, "safe-upgrade old should have 3 public functions (init, transfer, balance)");
+    assert_eq!(
+        ast.storage_keys.len(),
+        2,
+        "safe-upgrade old should have 2 storage keys"
+    );
+    assert_eq!(
+        ast.functions.len(),
+        3,
+        "safe-upgrade old should have 3 public functions (init, transfer, balance)"
+    );
 }
 
 /// Test that the safe-upgrade new version parses without errors.
@@ -24,8 +32,16 @@ fn safe_upgrade_new_parses() {
         .unwrap()
         .join("examples/safe-upgrade/new");
     let ast = soroban_drift_core::rust_parser::parse_crate(&path).unwrap();
-    assert_eq!(ast.storage_keys.len(), 2, "safe-upgrade new should have 2 storage keys");
-    assert_eq!(ast.functions.len(), 4, "safe-upgrade new should have 4 public functions (init, transfer, transfer_from, balance)");
+    assert_eq!(
+        ast.storage_keys.len(),
+        2,
+        "safe-upgrade new should have 2 storage keys"
+    );
+    assert_eq!(
+        ast.functions.len(),
+        4,
+        "safe-upgrade new should have 4 public functions (init, transfer, transfer_from, balance)"
+    );
 }
 
 /// Test that the breaking-upgrade old version parses without errors.
@@ -38,8 +54,16 @@ fn breaking_upgrade_old_parses() {
         .unwrap()
         .join("examples/breaking-upgrade/old");
     let ast = soroban_drift_core::rust_parser::parse_crate(&path).unwrap();
-    assert_eq!(ast.storage_keys.len(), 2, "breaking-upgrade old should have 2 storage keys");
-    assert_eq!(ast.functions.len(), 4, "breaking-upgrade old should have 4 public functions");
+    assert_eq!(
+        ast.storage_keys.len(),
+        2,
+        "breaking-upgrade old should have 2 storage keys"
+    );
+    assert_eq!(
+        ast.functions.len(),
+        4,
+        "breaking-upgrade old should have 4 public functions"
+    );
 }
 
 /// Test that the breaking-upgrade new version parses without errors.
@@ -52,8 +76,16 @@ fn breaking_upgrade_new_parses() {
         .unwrap()
         .join("examples/breaking-upgrade/new");
     let ast = soroban_drift_core::rust_parser::parse_crate(&path).unwrap();
-    assert_eq!(ast.storage_keys.len(), 2, "breaking-upgrade new should have 2 storage keys");
-    assert_eq!(ast.functions.len(), 4, "breaking-upgrade new should have 4 public functions");
+    assert_eq!(
+        ast.storage_keys.len(),
+        2,
+        "breaking-upgrade new should have 2 storage keys"
+    );
+    assert_eq!(
+        ast.functions.len(),
+        4,
+        "breaking-upgrade new should have 4 public functions"
+    );
 }
 
 /// Full diff: safe-upgrade should have no breaking changes.
@@ -78,8 +110,15 @@ fn safe_upgrade_no_breaking_changes() {
         &soroban_drift_core::types::ContractSpec::default(),
     );
 
-    let breaking: Vec<_> = findings.iter().filter(|f| f.severity == soroban_drift_core::types::Severity::Breaking).collect();
-    assert!(breaking.is_empty(), "safe-upgrade should have no breaking changes, found: {:?}", breaking);
+    let breaking: Vec<_> = findings
+        .iter()
+        .filter(|f| f.severity == soroban_drift_core::types::Severity::Breaking)
+        .collect();
+    assert!(
+        breaking.is_empty(),
+        "safe-upgrade should have no breaking changes, found: {:?}",
+        breaking
+    );
 }
 
 /// Full diff: breaking-upgrade should have breaking changes.
@@ -104,6 +143,13 @@ fn breaking_upgrade_has_breaking_changes() {
         &soroban_drift_core::types::ContractSpec::default(),
     );
 
-    let breaking: Vec<_> = findings.iter().filter(|f| f.severity == soroban_drift_core::types::Severity::Breaking).collect();
-    assert_eq!(breaking.len(), 2, "breaking-upgrade should have 2 breaking changes (storage field type + dropped auth)");
+    let breaking: Vec<_> = findings
+        .iter()
+        .filter(|f| f.severity == soroban_drift_core::types::Severity::Breaking)
+        .collect();
+    assert_eq!(
+        breaking.len(),
+        2,
+        "breaking-upgrade should have 2 breaking changes (storage field type + dropped auth)"
+    );
 }

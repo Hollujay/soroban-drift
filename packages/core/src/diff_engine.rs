@@ -36,11 +36,7 @@ pub fn diff(
     findings
 }
 
-fn diff_storage(
-    old: &[StorageKey],
-    new: &[StorageKey],
-    findings: &mut Vec<DriftFinding>,
-) {
+fn diff_storage(old: &[StorageKey], new: &[StorageKey], findings: &mut Vec<DriftFinding>) {
     let old_map: HashMap<&str, &StorageKey> = old.iter().map(|k| (k.name.as_str(), k)).collect();
     let new_map: HashMap<&str, &StorageKey> = new.iter().map(|k| (k.name.as_str(), k)).collect();
 
@@ -85,18 +81,17 @@ fn diff_storage(
 
                     if old_fields != new_fields {
                         // Check if any field types changed (breaking)
-                        let has_type_change = old_key.fields.iter().zip(&new_key.fields).any(
-                            |(old_f, new_f)| old_f.name == new_f.name && old_f.ty != new_f.ty,
-                        );
+                        let has_type_change = old_key
+                            .fields
+                            .iter()
+                            .zip(&new_key.fields)
+                            .any(|(old_f, new_f)| old_f.name == new_f.name && old_f.ty != new_f.ty);
 
                         if has_type_change {
                             findings.push(DriftFinding {
                                 severity: Severity::Breaking,
                                 category: "storage".to_string(),
-                                message: format!(
-                                    "Storage key '{}' has field type changes",
-                                    name
-                                ),
+                                message: format!("Storage key '{}' has field type changes", name),
                                 old_value: Some(old_fields.join(", ")),
                                 new_value: Some(new_fields.join(", ")),
                             });
@@ -132,11 +127,7 @@ fn diff_storage(
     }
 }
 
-fn diff_auth(
-    old: &[FunctionAuth],
-    new: &[FunctionAuth],
-    findings: &mut Vec<DriftFinding>,
-) {
+fn diff_auth(old: &[FunctionAuth], new: &[FunctionAuth], findings: &mut Vec<DriftFinding>) {
     let old_map: HashMap<&str, &FunctionAuth> =
         old.iter().map(|f| (f.function_name.as_str(), f)).collect();
     let new_map: HashMap<&str, &FunctionAuth> =
@@ -171,25 +162,20 @@ fn diff_auth(
                         findings.push(DriftFinding {
                             severity: Severity::Breaking,
                             category: "auth".to_string(),
-                            message: format!(
-                                "Function '{}' dropped require_auth()",
-                                name
-                            ),
+                            message: format!("Function '{}' dropped require_auth()", name),
                             old_value: Some("require_auth".to_string()),
                             new_value: Some("(none)".to_string()),
                         });
                     }
                 }
-                if old_fn.has_require_auth_for_args && !new_fn.has_require_auth_for_args
+                if old_fn.has_require_auth_for_args
+                    && !new_fn.has_require_auth_for_args
                     && !new_fn.has_require_auth
                 {
                     findings.push(DriftFinding {
                         severity: Severity::Breaking,
                         category: "auth".to_string(),
-                        message: format!(
-                            "Function '{}' dropped require_auth_for_args()",
-                            name
-                        ),
+                        message: format!("Function '{}' dropped require_auth_for_args()", name),
                         old_value: Some("require_auth_for_args".to_string()),
                         new_value: Some("(none)".to_string()),
                     });
@@ -212,11 +198,7 @@ fn diff_auth(
     }
 }
 
-fn diff_spec(
-    old: &ContractSpec,
-    new: &ContractSpec,
-    findings: &mut Vec<DriftFinding>,
-) {
+fn diff_spec(old: &ContractSpec, new: &ContractSpec, findings: &mut Vec<DriftFinding>) {
     let old_map: HashMap<&str, &FunctionSpec> =
         old.functions.iter().map(|f| (f.name.as_str(), f)).collect();
     let new_map: HashMap<&str, &FunctionSpec> =
@@ -239,14 +221,8 @@ fn diff_spec(
                         severity: Severity::Info,
                         category: "signature".to_string(),
                         message: format!("Function '{}' signature changed", name),
-                        old_value: Some(format!(
-                            "({:?}) -> ({:?})",
-                            old_fn.inputs, old_fn.outputs
-                        )),
-                        new_value: Some(format!(
-                            "({:?}) -> ({:?})",
-                            new_fn.inputs, new_fn.outputs
-                        )),
+                        old_value: Some(format!("({:?}) -> ({:?})", old_fn.inputs, old_fn.outputs)),
+                        new_value: Some(format!("({:?}) -> ({:?})", new_fn.inputs, new_fn.outputs)),
                     });
                 }
             }
@@ -286,33 +262,91 @@ mod tests {
 
     #[test]
     fn removed_storage_key_is_breaking() {
-        let old = vec![make_storage_key("Balance", StorageKeyKind::Struct, vec![("amount", "i128")])];
+        let old = vec![make_storage_key(
+            "Balance",
+            StorageKeyKind::Struct,
+            vec![("amount", "i128")],
+        )];
         let new = vec![];
-        let findings = diff(&old, &new, &[], &[], &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Breaking && f.category == "storage"));
+        let findings = diff(
+            &old,
+            &new,
+            &[],
+            &[],
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Breaking && f.category == "storage"));
     }
 
     #[test]
     fn added_storage_key_is_warning() {
         let old = vec![];
-        let new = vec![make_storage_key("Balance", StorageKeyKind::Struct, vec![("amount", "i128")])];
-        let findings = diff(&old, &new, &[], &[], &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Warning && f.category == "storage"));
+        let new = vec![make_storage_key(
+            "Balance",
+            StorageKeyKind::Struct,
+            vec![("amount", "i128")],
+        )];
+        let findings = diff(
+            &old,
+            &new,
+            &[],
+            &[],
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Warning && f.category == "storage"));
     }
 
     #[test]
     fn changed_field_type_is_breaking() {
-        let old = vec![make_storage_key("Balance", StorageKeyKind::Struct, vec![("amount", "i128")])];
-        let new = vec![make_storage_key("Balance", StorageKeyKind::Struct, vec![("amount", "u32")])];
-        let findings = diff(&old, &new, &[], &[], &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Breaking && f.category == "storage"));
+        let old = vec![make_storage_key(
+            "Balance",
+            StorageKeyKind::Struct,
+            vec![("amount", "i128")],
+        )];
+        let new = vec![make_storage_key(
+            "Balance",
+            StorageKeyKind::Struct,
+            vec![("amount", "u32")],
+        )];
+        let findings = diff(
+            &old,
+            &new,
+            &[],
+            &[],
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Breaking && f.category == "storage"));
     }
 
     #[test]
     fn unchanged_storage_no_findings() {
-        let old = vec![make_storage_key("Balance", StorageKeyKind::Struct, vec![("amount", "i128")])];
-        let new = vec![make_storage_key("Balance", StorageKeyKind::Struct, vec![("amount", "i128")])];
-        let findings = diff(&old, &new, &[], &[], &ContractSpec::default(), &ContractSpec::default());
+        let old = vec![make_storage_key(
+            "Balance",
+            StorageKeyKind::Struct,
+            vec![("amount", "i128")],
+        )];
+        let new = vec![make_storage_key(
+            "Balance",
+            StorageKeyKind::Struct,
+            vec![("amount", "i128")],
+        )];
+        let findings = diff(
+            &old,
+            &new,
+            &[],
+            &[],
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
         assert!(!findings.iter().any(|f| f.category == "storage"));
     }
 
@@ -328,8 +362,17 @@ mod tests {
             has_require_auth: false,
             has_require_auth_for_args: false,
         }];
-        let findings = diff(&[], &[], &old, &new, &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Breaking && f.category == "auth"));
+        let findings = diff(
+            &[],
+            &[],
+            &old,
+            &new,
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Breaking && f.category == "auth"));
     }
 
     #[test]
@@ -344,8 +387,17 @@ mod tests {
             has_require_auth: false,
             has_require_auth_for_args: true,
         }];
-        let findings = diff(&[], &[], &old, &new, &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Warning && f.category == "auth"));
+        let findings = diff(
+            &[],
+            &[],
+            &old,
+            &new,
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Warning && f.category == "auth"));
     }
 
     #[test]
@@ -360,8 +412,17 @@ mod tests {
             has_require_auth: false,
             has_require_auth_for_args: false,
         }];
-        let findings = diff(&[], &[], &old, &new, &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Breaking && f.category == "auth"));
+        let findings = diff(
+            &[],
+            &[],
+            &old,
+            &new,
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Breaking && f.category == "auth"));
     }
 
     #[test]
@@ -376,7 +437,14 @@ mod tests {
             has_require_auth: true,
             has_require_auth_for_args: false,
         }];
-        let findings = diff(&[], &[], &old, &new, &ContractSpec::default(), &ContractSpec::default());
+        let findings = diff(
+            &[],
+            &[],
+            &old,
+            &new,
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
         assert!(!findings.iter().any(|f| f.category == "auth"));
     }
 
@@ -392,8 +460,17 @@ mod tests {
             kind: StorageKeyKind::Struct,
             fields: vec![],
         }];
-        let findings = diff(&old, &new, &[], &[], &ContractSpec::default(), &ContractSpec::default());
-        assert!(findings.iter().any(|f| f.severity == Severity::Breaking && f.category == "storage"));
+        let findings = diff(
+            &old,
+            &new,
+            &[],
+            &[],
+            &ContractSpec::default(),
+            &ContractSpec::default(),
+        );
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Breaking && f.category == "storage"));
     }
 
     #[test]
@@ -401,25 +478,41 @@ mod tests {
         let old_spec = ContractSpec {
             functions: vec![FunctionSpec {
                 name: "transfer".to_string(),
-                inputs: vec![ParamInfo { name: "to".to_string(), ty: "Address".to_string() }],
+                inputs: vec![ParamInfo {
+                    name: "to".to_string(),
+                    ty: "Address".to_string(),
+                }],
                 outputs: vec![],
             }],
         };
         let new_spec = ContractSpec {
             functions: vec![FunctionSpec {
                 name: "transfer".to_string(),
-                inputs: vec![ParamInfo { name: "to".to_string(), ty: "i128".to_string() }],
+                inputs: vec![ParamInfo {
+                    name: "to".to_string(),
+                    ty: "i128".to_string(),
+                }],
                 outputs: vec![],
             }],
         };
         let findings = diff(&[], &[], &[], &[], &old_spec, &new_spec);
-        assert!(findings.iter().any(|f| f.severity == Severity::Info && f.category == "signature"));
+        assert!(findings
+            .iter()
+            .any(|f| f.severity == Severity::Info && f.category == "signature"));
     }
 
     #[test]
     fn no_changes_yields_empty_findings() {
-        let old_s = vec![make_storage_key("K", StorageKeyKind::Struct, vec![("x", "u32")])];
-        let new_s = vec![make_storage_key("K", StorageKeyKind::Struct, vec![("x", "u32")])];
+        let old_s = vec![make_storage_key(
+            "K",
+            StorageKeyKind::Struct,
+            vec![("x", "u32")],
+        )];
+        let new_s = vec![make_storage_key(
+            "K",
+            StorageKeyKind::Struct,
+            vec![("x", "u32")],
+        )];
         let old_a = vec![FunctionAuth {
             function_name: "f".to_string(),
             has_require_auth: true,

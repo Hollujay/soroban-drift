@@ -61,7 +61,8 @@ pub fn extract_auth(path: &Path) -> Result<Vec<FunctionAuth>, AuthExtractError> 
                         if let syn::ImplItem::Fn(method) = inner {
                             let fn_name = method.sig.ident.to_string();
                             if matches!(method.vis, syn::Visibility::Public(_)) {
-                                let (has_auth, has_auth_for_args) = extract_auth_from_block(&method.block);
+                                let (has_auth, has_auth_for_args) =
+                                    extract_auth_from_block(&method.block);
                                 functions.push(FunctionAuth {
                                     function_name: fn_name,
                                     has_require_auth: has_auth,
@@ -86,11 +87,7 @@ fn extract_auth_from_block(block: &syn::Block) -> (bool, bool) {
     (has_auth, has_auth_for_args)
 }
 
-fn check_block_stmts(
-    stmts: &[syn::Stmt],
-    has_auth: &mut bool,
-    has_auth_for_args: &mut bool,
-) {
+fn check_block_stmts(stmts: &[syn::Stmt], has_auth: &mut bool, has_auth_for_args: &mut bool) {
     for stmt in stmts {
         match stmt {
             syn::Stmt::Expr(expr, _) => {

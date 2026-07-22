@@ -96,10 +96,8 @@ fn extract_from_file(
                     if let syn::ImplItem::Fn(method) = inner {
                         let fn_name = method.sig.ident.to_string();
                         if matches!(method.vis, syn::Visibility::Public(_)) {
-                            let (has_auth, has_auth_for_args) = extract_auth_from_sig_and_block(
-                                &method.sig,
-                                &method.block,
-                            );
+                            let (has_auth, has_auth_for_args) =
+                                extract_auth_from_sig_and_block(&method.sig, &method.block);
                             functions.push(FunctionAuth {
                                 function_name: fn_name,
                                 has_require_auth: has_auth,
@@ -114,10 +112,7 @@ fn extract_from_file(
     }
 }
 
-fn extract_auth_from_sig_and_block(
-    _sig: &syn::Signature,
-    block: &syn::Block,
-) -> (bool, bool) {
+fn extract_auth_from_sig_and_block(_sig: &syn::Signature, block: &syn::Block) -> (bool, bool) {
     let mut has_auth = false;
     let mut has_auth_for_args = false;
     check_block_for_auth(block, &mut has_auth, &mut has_auth_for_args);
@@ -209,13 +204,19 @@ pub(crate) fn extract_enum_key(e: &ItemEnum) -> StorageKey {
             let ty = match &v.fields {
                 syn::Fields::Unit => "()".to_string(),
                 syn::Fields::Unnamed(f) => {
-                    let types: Vec<String> =
-                        f.unnamed.iter().map(|field| field_type_to_string(&field.ty)).collect();
+                    let types: Vec<String> = f
+                        .unnamed
+                        .iter()
+                        .map(|field| field_type_to_string(&field.ty))
+                        .collect();
                     types.join(", ")
                 }
                 syn::Fields::Named(f) => {
-                    let types: Vec<String> =
-                        f.named.iter().map(|field| field_type_to_string(&field.ty)).collect();
+                    let types: Vec<String> = f
+                        .named
+                        .iter()
+                        .map(|field| field_type_to_string(&field.ty))
+                        .collect();
                     types.join(", ")
                 }
             };
