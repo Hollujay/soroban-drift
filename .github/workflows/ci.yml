@@ -36,7 +36,7 @@ jobs:
       - name: Run unit tests
         run: cargo test --verbose
 
-      - name: Run CLI on safe-upgrade (expected: exit 0)
+      - name: Run CLI on safe-upgrade (expected exit 0)
         run: |
           cargo run --bin soroban-drift-cli -- \
             examples/safe-upgrade/old \
@@ -45,7 +45,7 @@ jobs:
             --fail-on breaking
         if: success()
 
-      - name: Run CLI on breaking-upgrade (expected: exit 1)
+      - name: Run CLI on breaking-upgrade (expected exit 1)
         run: |
           cargo run --bin soroban-drift-cli -- \
             examples/breaking-upgrade/old \
