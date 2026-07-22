@@ -100,17 +100,14 @@ pub fn exit_code(report: &DriftReport, fail_on: &str) -> i32 {
                 0
             }
         }
-        "warning" => {
+        "warning"
             if report.has_breaking_changes
                 || report
                     .findings
                     .iter()
-                    .any(|f| f.severity == Severity::Warning)
-            {
-                1
-            } else {
-                0
-            }
+                    .any(|f| f.severity == Severity::Warning) =>
+        {
+            1
         }
         _ => 0,
     }

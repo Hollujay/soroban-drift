@@ -16,7 +16,7 @@ use std::collections::HashMap;
 /// Auth changes are classified as:
 ///   - Breaking: function dropped require_auth() entirely
 ///   - Warning: function changed from require_auth() to require_auth_for_args()
-///   (weakening but not fully removing auth)
+///     (weakening but not fully removing auth)
 ///
 /// Signature changes are classified as Info.
 pub fn diff(
@@ -229,7 +229,7 @@ fn diff_spec(old: &ContractSpec, new: &ContractSpec, findings: &mut Vec<DriftFin
         }
     }
 
-    for (name, _) in &new_map {
+    for name in new_map.keys() {
         if !old_map.contains_key(name) {
             findings.push(DriftFinding {
                 severity: Severity::Info,

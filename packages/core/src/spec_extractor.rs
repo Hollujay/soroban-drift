@@ -90,7 +90,7 @@ fn parse_contractspec_section(data: &[u8], spec: &mut ContractSpec) {
                     break;
                 }
             }
-            1 | 2 | 3 => {
+            1..=3 => {
                 // Struct, enum/union, or error type — skip for now
                 // We'd need full XDR parsing to skip correctly; for now,
                 // break to avoid misaligned reads
@@ -232,7 +232,7 @@ fn read_scalar_type(data: &[u8], offset: usize) -> Option<(String, usize)> {
         16 => ("Address".to_string(), 4),
         17 => ("String".to_string(), 4),
         18 => ("Symbol".to_string(), 4),
-        19 | 20 | 21 | 22 => {
+        19..=22 => {
             // Vec, Map, Contract, Option — complex types, we skip details
             // For now, return a generic name
             let name = match disc {
