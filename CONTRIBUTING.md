@@ -31,3 +31,9 @@ scopes: core, cli, ci, examples
 ```
 
 One commit per logical unit of work. Every commit builds and passes tests.
+
+## Submitting a PR
+
+- Branch from `main` and open your PR against `main`
+- Reference the issue number your PR closes (e.g. "Closes #12") in the description
+- Keep each PR scoped to a single issue — avoid bundling unrelated changes

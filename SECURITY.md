@@ -6,4 +6,4 @@ soroban-drift is a drift/diff checker, not a security auditor. It does not:
 - Perform semantic or logic analysis
 - Detect all possible breaking changes
 
-Report security vulnerabilities by opening an issue at https://github.com/anomalyco/soroban-drift/issues.
+Report security vulnerabilities privately via GitHub Security Advisories at https://github.com/Hollujay/soroban-drift/security/advisories/new. Do not report them via public Issues.
