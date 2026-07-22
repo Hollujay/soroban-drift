@@ -1,64 +1,86 @@
 # soroban-drift
 
-Static-analysis CLI tool that detects breaking changes between two versions of a Soroban smart contract's Rust source.
+[![CI](https://github.com/Hollujay/soroban-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/Hollujay/soroban-drift/actions/workflows/ci.yml)
 
-## What it checks
+A static-analysis CLI that detects breaking changes between two versions of a Soroban smart contract's Rust source — storage layout drift, dropped or weakened require_auth() checks, and function signature changes — before you deploy an upgrade.
 
-- **Storage layout drift** — changed, removed, or type-changed storage keys (extracted from `#[contracttype]` definitions and `env.storage()` call sites)
-- **Auth requirement regressions** — public functions that dropped or weakened a `require_auth()` / `require_auth_for_args()` call
-- **Signature changes** — informational diff of function signatures, extracted from the compiled WASM's `contractspecv0` custom section
+## What this is (and isn't)
 
-## What it does NOT do
+soroban-drift is a drift/diff checker, not a security auditor. It does not:
 
-- General security auditing
-- Semantic or logic diffing
-- Gas or fee regression analysis
+- Provide any security guarantee or audit certification
+- Perform semantic or logic analysis
+- Detect all possible breaking changes
 
-## Usage
+It checks three things, precisely:
 
-```bash
-# Compare two source directories
-cargo run -- examples/safe-upgrade/old examples/safe-upgrade/new
+- **Storage layout drift** — changed, removed, or type-changed storage keys
+- **Auth requirement regressions** — functions that dropped or weakened a require_auth() / require_auth_for_args() call between versions
+- **Signature changes** — informational diff of function signatures, read from the compiled WASM's contractspecv0 section
 
-# With WASM spec files
-cargo run -- --old-wasm old.wasm --new-wasm new.wasm path/to/old path/to/new
+## Quick start
 
-# JSON output, fail only on breaking changes
-cargo run -- --format json --fail-on breaking path/to/old path/to/new
-```
-
-### Options
-
-- `old`, `new` — paths to contract crate source directories (positional, required)
-- `--old-wasm`, `--new-wasm` — paths to compiled WASM files (optional, enables signature analysis)
-- `--format <json|markdown>` — output format (default: markdown)
-- `--fail-on <breaking|warning|none>` — exit code behavior (default: breaking)
-
-### Exit codes
-
-- `0` — no findings at the configured severity level
-- `1` — findings found at or above the configured severity level
-
-## Project structure
-
-```
-soroban-drift/
-├── Cargo.toml              # workspace root
-├── packages/
-│   ├── core/               # analysis library
-│   └── cli/                # CLI binary
-└── examples/
-    ├── safe-upgrade/        # contract with no breaking changes
-    └── breaking-upgrade/    # contract with storage + auth regressions
-```
-
-## Building
+Requires Rust (stable, edition 2021) and the Stellar CLI if you want to build the example fixtures yourself.
 
 ```bash
-cargo build
-cargo test
+git clone https://github.com/Hollujay/soroban-drift.git
+cd soroban-drift
+cargo build --release
 ```
 
-## License
+Run it against the included example fixtures:
 
-MIT OR Apache-2.0
+```bash
+./target/release/soroban-drift-cli examples/breaking-upgrade/old examples/breaking-upgrade/new
+# Soroban Drift Report
+#
+# - **Old version**: `examples/breaking-upgrade/old`
+# - **New version**: `examples/breaking-upgrade/new`
+# - **Status**: BREAKING CHANGES DETECTED
+#
+# ## Breaking Changes
+#
+# - **storage**
+#   - Storage key 'Balance' has field type changes
+#   - Old: `amount: i128, owner: Address`
+#   - New: `amount: u32, owner: Address`
+#
+# - **auth**
+#   - Function 'transfer' dropped require_auth()
+#   - Old: `require_auth`
+#   - New: `(none)`
+#
+# ## Warnings
+#
+# - **auth**
+#   - Function 'admin_op' changed from require_auth() to require_auth_for_args()
+#   - Old: `require_auth`
+#   - New: `require_auth_for_args`
+```
+
+`--format json|markdown` and `--fail-on breaking|warning|none` are both supported — the latter is useful for wiring this into CI, exiting non-zero when breaking changes are found.
+
+Not yet published to crates.io; build from source for now.
+
+## Architecture
+
+```
+rust-parser  → parses contract source into an AST
+  ├─ storage-extractor  → extracts storage key/type schema
+  └─ auth-extractor     → extracts require_auth() call sites
+spec-extractor           → reads function signatures from compiled WASM
+  ↓
+diff-engine  → compares old vs. new, classifies each change by severity
+  ↓
+report-generator → JSON / Markdown / CI exit code
+```
+
+Storage and auth analysis operate on Rust source, not the compiled WASM — the WASM's contractspecv0 section only exposes function/type signatures, not storage key usage, so source-level analysis is what makes the storage and auth checks possible at all.
+
+## Contributing
+
+See CONTRIBUTING.md for development setup, code style, and how to submit a PR. Security issues should be reported privately — see SECURITY.md.
+
+## Maintainer
+
+@Hollujay.
