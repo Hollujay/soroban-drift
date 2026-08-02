@@ -5,9 +5,12 @@ description = "CLI tool for detecting breaking changes in Soroban smart contract
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
+repository.workspace = true
+keywords = ["soroban", "stellar", "cli", "breaking-changes", "diff"]
+categories = ["command-line-utilities"]
 
 [dependencies]
-soroban-drift-core = { path = "../core" }
+soroban-drift-core = { version = "0.1.0", path = "../core" }
 clap = { version = "4.6.3", features = ["derive"] }
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }

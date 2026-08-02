@@ -6,3 +6,4 @@ members = ["packages/core", "packages/cli"]
 edition = "2021"
 rust-version = "1.79"
 license = "Apache-2.0"
+repository = "https://github.com/Hollujay/soroban-drift"

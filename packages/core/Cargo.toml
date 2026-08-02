@@ -5,6 +5,9 @@ description = "Static-analysis library for detecting breaking changes in Soroban
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
+repository.workspace = true
+keywords = ["soroban", "stellar", "breaking-changes", "static-analysis", "smart-contracts"]
+categories = ["development-tools::testing"]
 
 [dependencies]
 syn = { version = "2.0.119", features = ["full", "extra-traits"] }
