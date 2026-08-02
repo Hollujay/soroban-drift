@@ -17,9 +17,9 @@ soroban-drift is a drift/diff checker, not a security auditor. It does not:
 
 It checks three things, precisely:
 
-- **Storage layout drift** — changed, removed, or type-changed storage keys
-- **Auth requirement regressions** — functions that dropped or weakened a require_auth() / require_auth_for_args() call between versions
-- **Signature changes** — informational diff of function signatures, read from the compiled WASM's contractspecv0 section
+- **Storage layout drift**: changed, removed, or type-changed storage keys
+- **Auth requirement regressions**: functions that dropped or weakened a require_auth() / require_auth_for_args() call between versions
+- **Signature changes**: informational diff of function signatures, read from the compiled WASM's contractspecv0 section
 
 ## Quick start
 
@@ -61,7 +61,7 @@ Run it against the included example fixtures:
 #   - New: `require_auth_for_args`
 ```
 
-`--format json|markdown` and `--fail-on breaking|warning|none` are both supported — the latter is useful for wiring this into CI, exiting non-zero when breaking changes are found.
+`--format json|markdown` and `--fail-on breaking|warning|none` are both supported. The latter is useful for wiring this into CI, exiting non-zero when breaking changes are found.
 
 Not yet published to crates.io; build from source for now.
 
@@ -78,11 +78,11 @@ diff-engine  → compares old vs. new, classifies each change by severity
 report-generator → JSON / Markdown / CI exit code
 ```
 
-Storage and auth analysis operate on Rust source, not the compiled WASM — the WASM's contractspecv0 section only exposes function/type signatures, not storage key usage, so source-level analysis is what makes the storage and auth checks possible at all.
+Storage and auth analysis operate on Rust source, not the compiled WASM. The WASM's contractspecv0 section only exposes function/type signatures, not storage key usage, so source-level analysis is what makes the storage and auth checks possible at all.
 
 ## Contributing
 
-See CONTRIBUTING.md for development setup, code style, and how to submit a PR. Security issues should be reported privately — see SECURITY.md.
+See CONTRIBUTING.md for development setup, code style, and how to submit a PR. Security issues should be reported privately. See SECURITY.md.
 
 ## Maintainers
 
