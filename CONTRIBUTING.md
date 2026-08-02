@@ -10,7 +10,7 @@ cargo test
 ### Code style
 
 - `cargo fmt` before committing
-- `cargo clippy` — no warnings
+- `cargo clippy`: no warnings
 - No `unwrap()` outside `#[cfg(test)]` blocks
 - No floating point types
 - `snake_case` for functions/modules, `PascalCase` for types
@@ -36,4 +36,4 @@ One commit per logical unit of work. Every commit builds and passes tests.
 
 - Branch from `main` and open your PR against `main`
 - Reference the issue number your PR closes (e.g. "Closes #12") in the description
-- Keep each PR scoped to a single issue — avoid bundling unrelated changes
+- Keep each PR scoped to a single issue: avoid bundling unrelated changes
