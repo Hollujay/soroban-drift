@@ -1,3 +1,5 @@
+![soroban-drift](assets/soroban-drift.svg)
+
 # soroban-drift
 
 [![CI](https://github.com/Hollujay/soroban-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/Hollujay/soroban-drift/actions/workflows/ci.yml)
