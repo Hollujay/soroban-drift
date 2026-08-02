@@ -1,6 +1,7 @@
 # soroban-drift
 
 [![CI](https://github.com/Hollujay/soroban-drift/actions/workflows/ci.yml/badge.svg)](https://github.com/Hollujay/soroban-drift/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 A static-analysis CLI that detects breaking changes between two versions of a Soroban smart contract's Rust source — storage layout drift, dropped or weakened require_auth() checks, and function signature changes — before you deploy an upgrade.
 
