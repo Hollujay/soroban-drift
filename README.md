@@ -82,6 +82,8 @@ Storage and auth analysis operate on Rust source, not the compiled WASM — the 
 
 See CONTRIBUTING.md for development setup, code style, and how to submit a PR. Security issues should be reported privately — see SECURITY.md.
 
-## Maintainer
+## Maintainers
 
-@Hollujay.
+| Name | GitHub |
+|---|---|
+| Hollujay | [@Hollujay](https://github.com/Hollujay) |
