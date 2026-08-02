@@ -63,7 +63,19 @@ Run it against the included example fixtures:
 
 `--format json|markdown` and `--fail-on breaking|warning|none` are both supported. The latter is useful for wiring this into CI, exiting non-zero when breaking changes are found.
 
-Not yet published to crates.io; build from source for now.
+Install it from crates.io:
+
+```bash
+cargo install soroban-drift-cli
+```
+
+Or build from source:
+
+```bash
+git clone https://github.com/Hollujay/soroban-drift.git
+cd soroban-drift
+cargo build --release
+```
 
 ## Architecture
 
