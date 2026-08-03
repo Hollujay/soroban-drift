@@ -25,16 +25,16 @@ It checks three things, precisely:
 
 Requires Rust (stable, edition 2021) and the Stellar CLI if you want to build the example fixtures yourself.
 
+Install it from crates.io:
+
 ```bash
-git clone https://github.com/Hollujay/soroban-drift.git
-cd soroban-drift
-cargo build --release
+cargo install soroban-drift-cli
 ```
 
 Run it against the included example fixtures:
 
 ```bash
-./target/release/soroban-drift-cli examples/breaking-upgrade/old examples/breaking-upgrade/new
+soroban-drift-cli examples/breaking-upgrade/old examples/breaking-upgrade/new
 # Soroban Drift Report
 #
 # - **Old version**: `examples/breaking-upgrade/old`
@@ -63,13 +63,9 @@ Run it against the included example fixtures:
 
 `--format json|markdown` and `--fail-on breaking|warning|none` are both supported. The latter is useful for wiring this into CI, exiting non-zero when breaking changes are found.
 
-Install it from crates.io:
+### Building from source
 
-```bash
-cargo install soroban-drift-cli
-```
-
-Or build from source:
+For contributors, or anyone who wants to build the example fixtures themselves:
 
 ```bash
 git clone https://github.com/Hollujay/soroban-drift.git
